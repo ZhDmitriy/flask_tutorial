@@ -1,0 +1,22 @@
+# запуск нескольких сервисов
+version: '2'
+services:
+  flask:
+    build: .
+    container_name: first-ncontainer-name
+    # ставим веб-сервер для будущего деплоя
+    #command: gunicorn -2 4 -b 0.0.0.0:5000 'project:create_app()' --reload
+    command: flask run --host=0.0.0.0
+    environment:
+      # создаем системную переменную, чтобы запускать приложение flask внутри Docker'а
+      - FLASK_APP=project.py
+      - FLASK_DEBUG=1 # чтобы происходило обновление запуска нового кодо внутри контейнера
+      - PYTHONUNBUFFERED=True # печать в консоль команды python
+    ports:
+      # 5000 порт на локальной машине = 5000 порт в контейнере
+      - "5000:5000"
+    # связать локальную машину с Docker контейнером
+    volumes:
+      - ./:/root
+    # Перезапускаем сервис в случае падения
+    restart: on-failure
